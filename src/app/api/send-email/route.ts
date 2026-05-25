@@ -44,8 +44,9 @@ export async function POST(request: Request) {
     // Try sending email
     if (process.env.RESEND_API_KEY) {
       const { data, error } = await resend.emails.send({
-        from: 'WSR Messenger <onboarding@resend.dev>', // Should be updated when real domain is added
+        from: 'WSR Messenger <meow@rdkitty.com>', // Updated to custom domain
         to: process.env.BOARD_EMAILS ? process.env.BOARD_EMAILS.split(',') : ['delivered@resend.dev'],
+        cc: email,
         replyTo: email,
         subject: subject,
         html: html,
