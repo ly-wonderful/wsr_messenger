@@ -1,66 +1,38 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import MessengerForm from './components/MessengerForm';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main style={{ 
+      minHeight: '100vh', 
+      padding: '4rem 1rem',
+      background: 'linear-gradient(135deg, var(--color-bg) 0%, #e2e8f0 100%)'
+    }}>
+      <div className="container">
+        <header className="text-center mb-4">
+          <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Windsong Ranch</h1>
+          <p style={{ fontSize: '1.2rem', color: 'var(--color-text-light)' }}>
+            HOA Board Communication Portal
+          </p>
+        </header>
+
+        <div style={{
+          backgroundColor: 'var(--color-primary)',
+          color: 'white',
+          padding: '2rem',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
+          textAlign: 'center',
+          marginBottom: '2rem'
+        }}>
+          <h2 style={{ color: 'var(--color-secondary)', margin: 0, paddingBottom: '0.5rem' }}>Welcome Residents</h2>
+          <p style={{ opacity: 0.9, maxWidth: '600px', margin: '0 auto' }}>
+            Use this secure portal to send messages directly to all members of the Windsong Ranch HOA Board. 
+            Select a topic to get started with a pre-formatted template, or create your own.
           </p>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <MessengerForm />
+      </div>
+    </main>
   );
 }
