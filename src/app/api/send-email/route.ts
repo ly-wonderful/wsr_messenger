@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import db from '@/lib/db';
+import db, { ensureDbInitialized } from '@/lib/db';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_placeholder');
 
@@ -13,13 +13,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    await ensureDbInitialized();
+
     // Increment topic sent count
-    const update = db.prepare('UPDATE topics SET sent_count = sent_count + 1 WHERE id = ?');
-    update.run(topicId);
+    await db.execute({
+      sql: 'UPDATE topics SET sent_count = sent_count + 1 WHERE id = ?',
+      args: [topicId]
+    });
 
     // Get topic name for the email subject
-    const topic = db.prepare('SELECT name FROM topics WHERE id = ?').get(topicId) as { name: string };
-    const subject = `[WSR HOA] ${topic ? topic.name : 'Resident Message'} from ${firstName} ${lastName}`;
+    const topicResult = await db.execute({
+      sql: 'SELECT name FROM topics WHERE id = ?',
+      args: [topicId]
+    });
+    const topic = topicResult.rows[0];
+    const subject = `[WSR HOA] ${topic ? String(topic.name) : 'Resident Message'} from ${firstName} ${lastName}`;
 
     // Construct email html
     const html = `

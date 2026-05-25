@@ -1,41 +1,66 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
+import { createClient } from '@libsql/client';
 
-// Ensure data directory exists
-const dataDir = path.join(process.cwd(), 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+const url = process.env.TURSO_DATABASE_URL || 'file:data/wsr_messenger.db';
+const authToken = process.env.TURSO_AUTH_TOKEN;
 
-const db = new Database(path.join(dataDir, 'wsr_messenger.db'));
+export const db = createClient({
+  url,
+  authToken,
+});
 
-// Initialize database
-db.exec(`
-  CREATE TABLE IF NOT EXISTS topics (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    default_message TEXT NOT NULL,
-    sent_count INTEGER DEFAULT 0
-  );
-`);
+let initPromise: Promise<void> | null = null;
 
-// Seed initial topics if empty
-const count = db.prepare('SELECT COUNT(*) as count FROM topics').get() as { count: number };
-if (count.count === 0) {
-  const insert = db.prepare('INSERT INTO topics (name, default_message) VALUES (?, ?)');
-  insert.run(
-    'Maintenance Request',
-    'Dear HOA Board,\n\nI am writing to submit a maintenance request regarding...'
-  );
-  insert.run(
-    'Community Suggestion',
-    'Dear HOA Board,\n\nI have a suggestion for the Windsong Ranch community that I would like to share...'
-  );
-  insert.run(
-    'Noise Complaint',
-    'Dear HOA Board,\n\nI am writing to report a noise issue at...'
-  );
+export async function ensureDbInitialized() {
+  if (initPromise) {
+    return initPromise;
+  }
+
+  initPromise = (async () => {
+    // 1. Create table if not exists
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS topics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        default_message TEXT NOT NULL,
+        sent_count INTEGER DEFAULT 0
+      );
+    `);
+
+    // 2. Seed initial topics if empty
+    const countResult = await db.execute('SELECT COUNT(*) as count FROM topics');
+    const count = Number(countResult.rows[0]?.count || 0);
+
+    if (count === 0) {
+      const queries = [
+        {
+          sql: 'INSERT INTO topics (name, default_message) VALUES (?, ?)',
+          args: [
+            'Maintenance Request',
+            'Dear HOA Board,\n\nI am writing to submit a maintenance request regarding...'
+          ]
+        },
+        {
+          sql: 'INSERT INTO topics (name, default_message) VALUES (?, ?)',
+          args: [
+            'Community Suggestion',
+            'Dear HOA Board,\n\nI have a suggestion for the Windsong Ranch community that I would like to share...'
+          ]
+        },
+        {
+          sql: 'INSERT INTO topics (name, default_message) VALUES (?, ?)',
+          args: [
+            'Noise Complaint',
+            'Dear HOA Board,\n\nI am writing to report a noise issue at...'
+          ]
+        }
+      ];
+
+      // Execute in a batch transaction
+      await db.batch(queries);
+    }
+  })();
+
+  return initPromise;
 }
 
 export default db;
