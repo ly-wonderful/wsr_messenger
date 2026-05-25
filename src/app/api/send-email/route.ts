@@ -39,12 +39,16 @@ export async function POST(request: Request) {
       <hr />
       <h3>Message:</h3>
       <p>${message.replace(/\n/g, '<br/>')}</p>
+      <hr />
+      <p style="font-size: 11px; color: #64748b; font-style: italic;">
+        Disclaimer: This message was sent via an independent tool provided by a resident for non-profit purposes to facilitate communication with the HOA Board. It is not officially affiliated with or endorsed by the Windsong Ranch HOA.
+      </p>
     `;
 
     // Try sending email
     if (process.env.RESEND_API_KEY) {
       const { data, error } = await resend.emails.send({
-        from: 'WSR Messenger <meow@rdkitty.com>', // Updated to custom domain
+        from: 'WSR Messenger <meow@rdkitty.com>', // Updated to custom domain 
         to: process.env.BOARD_EMAILS ? process.env.BOARD_EMAILS.split(',') : ['delivered@resend.dev'],
         cc: email,
         replyTo: email,

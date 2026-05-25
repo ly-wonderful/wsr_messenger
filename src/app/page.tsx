@@ -16,6 +16,20 @@ export default function Home() {
         </header>
 
         <div style={{
+          backgroundColor: '#f8fafc', // slate-50
+          border: '1px solid #e2e8f0', // slate-200
+          borderRadius: 'var(--radius-lg)',
+          padding: '1rem 1.5rem',
+          marginBottom: '2rem',
+          textAlign: 'center',
+          fontSize: '0.875rem',
+          color: '#64748b', // slate-500
+          fontStyle: 'italic'
+        }}>
+          Disclaimer: This website is an independent tool provided by a resident for non-profit purposes and is not officially affiliated with, managed by, or endorsed by the Windsong Ranch HOA.
+        </div>
+
+        <div style={{
           backgroundColor: 'var(--color-primary)',
           color: 'white',
           padding: '2rem',
